@@ -25,6 +25,7 @@ type Product struct {
 	Price        int                `json:"harga,omitempty" bson:"harga,omitempty"`
 	CategoryName Category           `bson:"category_name,omitempty" json:"category_name,omitempty"`
 	StoreName    Store              `bson:"store_name,omitempty" json:"store_name,omitempty"`
+	Address      Store              `bson:"address,omitempty" json:"address,omitempty"`
 }
 
 // Store represents the table Store
