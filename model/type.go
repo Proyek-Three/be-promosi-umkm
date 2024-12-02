@@ -19,10 +19,9 @@ type Users struct {
 type Product struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	ProductName  string             `json:"product_name,omitempty" bson:"product_name,omitempty"`
-	Name         string             `json:"nama_toko,omitempty" bson:"nama_toko,omitempty"`
-	Description  string             `json:"deskripsi,omitempty" bson:"deskripsi,omitempty"`
-	Image        string             `json:"gambar,omitempty" bson:"gambar,omitempty"`
-	Price        int                `json:"harga,omitempty" bson:"harga,omitempty"`
+	Description  string             `json:"description,omitempty" bson:"description,omitempty"`
+	Image        string             `json:"image,omitempty" bson:"image,omitempty"`
+	Price        int                `json:"price,omitempty" bson:"price,omitempty"`
 	CategoryName Category           `bson:"category_name,omitempty" json:"category_name,omitempty"`
 	StoreName    Store              `bson:"store_name,omitempty" json:"store_name,omitempty"`
 	Address      Store              `bson:"address,omitempty" json:"address,omitempty"`
