@@ -2,8 +2,8 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
 	// "time"
 
 	"github.com/Proyek-Three/be-promosi-umkm/model"
@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
 )
 
 func MongoConnect(dbname string) (db *mongo.Database) {
@@ -51,71 +52,72 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 }
 
 // ALL
-// func GetAllMenu(db *mongo.Database, col string) (data []model.Menu) {
-// 	menurestoran := db.Collection(col)
-// 	filter := bson.M{}
-// 	cursor, err := menurestoran.Find(context.TODO(), filter)
-// 	if err != nil {
-// 		fmt.Println("GetALLData :", err)
-// 	}
-// 	err = cursor.All(context.TODO(), &data)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-// 	return
-// }
+func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
+	productdata := db.Collection(col)
+	filter := bson.M{}
+	cursor, err := productdata.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("GetALLData :", err)
+	}
+	err = cursor.All(context.TODO(), &data)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return
+}
 
 // ID
-// func GetMenuFromID(_id primitive.ObjectID, db *mongo.Database, col string) (menu model.Menu, errs error) {
-// 	menurestoran := db.Collection(col)
-// 	filter := bson.M{"_id": _id}
-// 	err := menurestoran.FindOne(context.TODO(), filter).Decode(&menu)
-// 	if err != nil {
-// 		if err == mongo.ErrNoDocuments {
-// 			return menu, fmt.Errorf("no data found for ID %s", _id.Hex())
-// 		}
-// 		return menu, fmt.Errorf("error retrieving data for ID %s: %s", _id.Hex(), err.Error())
-// 	}
-// 	return menu, nil
-// }
+func GetProductFromID(_id primitive.ObjectID, db *mongo.Database, col string) (product model.Product, errs error) {
+	productdata := db.Collection(col)
+	filter := bson.M{"_id": _id}
+	err := productdata.FindOne(context.TODO(), filter).Decode(&product)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return product, fmt.Errorf("no data found for ID %s", _id.Hex())
+		}
+		return product, fmt.Errorf("error retrieving data for ID %s: %s", _id.Hex(), err.Error())
+	}
+	return product, nil
+}
 
 // UPDATE
-// func UpdateMenu(db *mongo.Database, col string, id primitive.ObjectID, nama string, harga float64, deskripsi string, gambar string, kategori model.Kategori, bahanBaku model.BahanBaku) (err error) {
-// 	filter := bson.M{"_id": id}
-// 	update := bson.M{
-// 		"$set": bson.M{
-// 			"nama":       nama,
-// 			"harga":      harga,
-// 			"deskripsi":  deskripsi,
-// 			"gambar":     gambar,
-// 			"kategori":   kategori,
-// 			"bahan_baku": bahanBaku,
-// 		},
-// 	}
-// 	result, err := db.Collection(col).UpdateOne(context.Background(), filter, update)
-// 	if err != nil {
-// 		fmt.Printf("UpdateMenu: %v\n", err)
-// 		return
-// 	}
-// 	if result.ModifiedCount == 0 {
-// 		err = errors.New("no data has been changed with the specified ID")
-// 		return
-// 	}
-// 	return nil
-// }
+func UpdateProduct(db *mongo.Database, col string, id primitive.ObjectID, ProductName string, Description string, Image string, Price float64, CategoryName model.Category, StoreName model.Store, Address model.Store) (err error) {
+	filter := bson.M{"_id": id}
+	update := bson.M{
+		"$set": bson.M{
+			"product_name":  ProductName,
+			"description":   Description,
+			"image":         Image,
+			"price":         Price,
+			"category_name": CategoryName,
+			"store_name":    StoreName,
+			"address":       Address,
+		},
+	}
+	result, err := db.Collection(col).UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		fmt.Printf("UpdateProduct: %v\n", err)
+		return
+	}
+	if result.ModifiedCount == 0 {
+		err = errors.New("no data has been changed with the specified ID")
+		return
+	}
+	return nil
+}
 
-// func DeleteMenuByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
-// 	menurestoran := db.Collection(col)
-// 	filter := bson.M{"_id": _id}
+func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
+	productdata := db.Collection(col)
+	filter := bson.M{"_id": _id}
 
-// 	result, err := menurestoran.DeleteOne(context.TODO(), filter)
-// 	if err != nil {
-// 		return fmt.Errorf("error deleting data for ID %s: %s", _id, err.Error()) //mengembalikan pesan kesalahan jika terjadi kesalahan saat menghapus data
-// 	}
+	result, err := productdata.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return fmt.Errorf("error deleting data for ID %s: %s", _id, err.Error()) //mengembalikan pesan kesalahan jika terjadi kesalahan saat menghapus data
+	}
 
-// 	if result.DeletedCount == 0 {
-// 		return fmt.Errorf("data with ID %s not found", _id)
-// 	}
+	if result.DeletedCount == 0 {
+		return fmt.Errorf("data with ID %s not found", _id)
+	}
 
-// 	return nil
-// }
+	return nil
+}
