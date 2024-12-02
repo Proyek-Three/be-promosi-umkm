@@ -14,7 +14,7 @@ import (
 
 )
 
-func MongoConnect(dbname string) (db *mongo.Database) {
+func MongoConnnect(dbname string) (db *mongo.Database) {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(MongoString))
 	if err != nil {
 		fmt.Printf("MongoConnect: %v\n", err)
@@ -22,7 +22,7 @@ func MongoConnect(dbname string) (db *mongo.Database) {
 	return client.Database(dbname)
 }
 
-func InsertOneDo(db string, collection string, doc interface{}) (insertedID interface{}) {
+func InsertOneDoc(db string, collection string, doc interface{}) (insertedID interface{}) {
 	insertResult, err := MongoConnect(db).Collection(collection).InsertOne(context.TODO(), doc)
 	if err != nil {
 		fmt.Printf("InsertOneDoc: %v\n", err)
@@ -31,20 +31,14 @@ func InsertOneDo(db string, collection string, doc interface{}) (insertedID inte
 }
 
 // INSERT PRODUCT
-func InsertProduct(db *mongo.Database, col string, product model.Product) (insertedID primitive.ObjectID, err error) {
+func InsertCategory(db *mongo.Database, col string, product model.Category) (insertedID primitive.ObjectID, err error) {
 	// Membuat dokumen BSON untuk disimpan di MongoDB
-	productdata := bson.M{
-		"product_name":  product.ProductName,
-		"deskripsi":     product.Description,
-		"image":         product.Image,
-		"price":         product.Price,
-		"category_name": product.CategoryName,
-		"store_name":    product.StoreName,
-		"address":       product.Address,
+	categorydata := bson.M{
+		"category_name":  product.CategoryName,
 	}
-	result, err := db.Collection(col).InsertOne(context.Background(), productdata)
+	result, err := db.Collection(col).InsertOne(context.Background(), categorydata)
 	if err != nil { //Jika terjadi kesalahan saat menyisipkan dokumen, maka akan mengembalikan pesan kesalahan
-		fmt.Printf("InsertProduct: %v\n", err) //mencetak pesan kesalahan ke console
+		fmt.Printf("InsertCategory: %v\n", err) //mencetak pesan kesalahan ke console
 		return
 	}
 	insertedID = result.InsertedID.(primitive.ObjectID) //Mengambil ID dari dokumen yang baru saja disisipkan dan mengubahnya ke tipe primitive.ObjectID.
@@ -52,10 +46,10 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 }
 
 // ALL
-func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
-	productdata := db.Collection(col)
+func GetAllCategory(db *mongo.Database, col string) (data []model.Category) {
+	categorydata := db.Collection(col)
 	filter := bson.M{}
-	cursor, err := productdata.Find(context.TODO(), filter)
+	cursor, err := categorydata.Find(context.TODO(), filter)
 	if err != nil {
 		fmt.Println("GetALLData :", err)
 	}
@@ -67,36 +61,30 @@ func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
 }
 
 // ID
-func GetProductFromID(_id primitive.ObjectID, db *mongo.Database, col string) (product model.Product, errs error) {
-	productdata := db.Collection(col)
+func GetCategoryFromID(_id primitive.ObjectID, db *mongo.Database, col string) (category model.Category, errs error) {
+	categorydata := db.Collection(col)
 	filter := bson.M{"_id": _id}
-	err := productdata.FindOne(context.TODO(), filter).Decode(&product)
+	err := categorydata.FindOne(context.TODO(), filter).Decode(&category)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return product, fmt.Errorf("no data found for ID %s", _id.Hex())
+			return category, fmt.Errorf("no data found for ID %s", _id.Hex())
 		}
-		return product, fmt.Errorf("error retrieving data for ID %s: %s", _id.Hex(), err.Error())
+		return category, fmt.Errorf("error retrieving data for ID %s: %s", _id.Hex(), err.Error())
 	}
-	return product, nil
+	return category, nil
 }
 
 // UPDATE
-func UpdateProduct(db *mongo.Database, col string, id primitive.ObjectID, ProductName string, Description string, Image string, Price float64, CategoryName model.Category, StoreName model.Store, Address model.Store) (err error) {
+func UpdateCategory(db *mongo.Database, col string, id primitive.ObjectID, CategoryName string) (err error) {
 	filter := bson.M{"_id": id}
 	update := bson.M{
 		"$set": bson.M{
-			"product_name":  ProductName,
-			"description":   Description,
-			"image":         Image,
-			"price":         Price,
-			"category_name": CategoryName,
-			"store_name":    StoreName,
-			"address":       Address,
+			"category_name":  CategoryName,
 		},
 	}
 	result, err := db.Collection(col).UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		fmt.Printf("UpdateProduct: %v\n", err)
+		fmt.Printf("UpdateCategory: %v\n", err)
 		return
 	}
 	if result.ModifiedCount == 0 {
@@ -106,7 +94,8 @@ func UpdateProduct(db *mongo.Database, col string, id primitive.ObjectID, Produc
 	return nil
 }
 
-func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
+
+func DeleteCategoryByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
 	productdata := db.Collection(col)
 	filter := bson.M{"_id": _id}
 
