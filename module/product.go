@@ -43,7 +43,7 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 	}
 	result, err := db.Collection(col).InsertOne(context.Background(), productdata)
 	if err != nil { //Jika terjadi kesalahan saat menyisipkan dokumen, maka akan mengembalikan pesan kesalahan
-		fmt.Printf("InsertMenu: %v\n", err) //mencetak pesan kesalahan ke console
+		fmt.Printf("InsertProduct: %v\n", err) //mencetak pesan kesalahan ke console
 		return
 	}
 	insertedID = result.InsertedID.(primitive.ObjectID) //Mengambil ID dari dokumen yang baru saja disisipkan dan mengubahnya ke tipe primitive.ObjectID.
