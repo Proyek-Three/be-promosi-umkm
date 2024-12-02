@@ -1,4 +1,4 @@
-package _714220031
+package _proyek3
 
 import (
 	"fmt"
