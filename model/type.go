@@ -21,7 +21,7 @@ type Product struct {
 	ProductName  string             `json:"product_name,omitempty" bson:"product_name,omitempty"`
 	Description  string             `json:"description,omitempty" bson:"description,omitempty"`
 	Image        string             `json:"image,omitempty" bson:"image,omitempty"`
-	Price        int                `json:"price,omitempty" bson:"price,omitempty"`
+	Price        float64            `json:"price,omitempty" bson:"price,omitempty"`
 	CategoryName Category           `bson:"category_name,omitempty" json:"category_name,omitempty"`
 	StoreName    Store              `bson:"store_name,omitempty" json:"store_name,omitempty"`
 	Address      Store              `bson:"address,omitempty" json:"address,omitempty"`
