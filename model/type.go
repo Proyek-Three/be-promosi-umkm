@@ -2,6 +2,7 @@ package model
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
 )
 
 // Users represents the table Users
@@ -38,4 +39,19 @@ type Store struct {
 type Category struct {
 	ID           int    `json:"id,omitempty" bson:"id,omitempty" gorm:"primaryKey;autoIncrement"`
 	CategoryName string `json:"category_name,omitempty" bson:"category_name,omitempty"`
+}
+
+// Model untuk User
+type User struct {
+	ID       string `bson:"_id,omitempty" json:"id"`
+	Username string `bson:"username" json:"username"`
+	Email    string `bson:"email" json:"email"`
+	Password string `bson:"password" json:"-"`
+}
+
+// Model untuk permintaan registrasi
+type UserRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
