@@ -38,9 +38,9 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"deskripsi":     product.Description,
 		"image":         product.Image,
 		"price":         product.Price,
-		"category_name": product.CategoryName,
-		"store_name":    product.StoreName,
-		"address":       product.Address,
+		"category_name": product.CategoryName.CategoryName,
+		"store_name":    product.StoreName.StoreName,
+		"address":       product.Address.Address,
 	}
 	result, err := db.Collection(col).InsertOne(context.Background(), productdata)
 	if err != nil { //Jika terjadi kesalahan saat menyisipkan dokumen, maka akan mengembalikan pesan kesalahan
