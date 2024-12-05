@@ -3,7 +3,8 @@ package module
 import (
 	"context"
 	"time"
-
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/Proyek-Three/be-promosi-umkm/model"
 	"golang.org/x/crypto/bcrypt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -49,4 +50,19 @@ func IsEmailExist(collection *mongo.Collection, email string) (bool, error) {
 	}
 
 	return count > 0, nil
+}
+
+func InsertAdmin(db *mongo.Database, col string, username string, password string, email string) (insertedID primitive.ObjectID, err error) {
+    admin := bson.M{
+    "user_name" : username,
+    "email"        : email,
+    "password"    : password,
+    }
+    result, err := db.Collection(col).InsertOne(context.Background(), admin)
+    if err != nil {
+        fmt.Printf("InsertAdmin: %v\n", err)
+        return
+    }
+    insertedID = result.InsertedID.(primitive.ObjectID)
+    return insertedID, nil
 }
