@@ -2,13 +2,14 @@ package module
 
 import (
 	"context"
-	"time"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+
 	"github.com/Proyek-Three/be-promosi-umkm/model"
-	"golang.org/x/crypto/bcrypt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Fungsi untuk membuat user baru
@@ -30,10 +31,13 @@ func CreateUser(collection *mongo.Collection, username, email, password string) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = collection.InsertOne(ctx, user)
+	result, err := collection.InsertOne(ctx, user)
 	if err != nil {
 		return model.User{}, err
 	}
+
+	// Set ID yang baru dibuat
+	user.ID = result.InsertedID.(primitive.ObjectID).Hex()
 
 	return user, nil
 }
@@ -52,17 +56,51 @@ func IsEmailExist(collection *mongo.Collection, email string) (bool, error) {
 	return count > 0, nil
 }
 
-func InsertAdmin(db *mongo.Database, col string, username string, password string, email string) (insertedID primitive.ObjectID, err error) {
-    admin := bson.M{
-    "user_name" : username,
-    "email"        : email,
-    "password"    : password,
-    }
-    result, err := db.Collection(col).InsertOne(context.Background(), admin)
-    if err != nil {
-        fmt.Printf("InsertAdmin: %v\n", err)
-        return
-    }
-    insertedID = result.InsertedID.(primitive.ObjectID)
-    return insertedID, nil
+// Fungsi untuk memasukkan admin baru
+func InsertAdmin(db *mongo.Database, col string, username, password, email string) (primitive.ObjectID, error) {
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+
+	admin := bson.M{
+		"user_name": username,
+		"email":     email,
+		"password":  string(hashedPassword),
+	}
+
+	result, err := db.Collection(col).InsertOne(context.Background(), admin)
+	if err != nil {
+		fmt.Printf("InsertAdmin: %v\n", err)
+		return primitive.NilObjectID, err
+	}
+
+	return result.InsertedID.(primitive.ObjectID), nil
+}
+
+// Fungsi untuk mendapatkan admin berdasarkan username
+func GetAdminByUsername(db *mongo.Database, col string, username string) (*model.User, error) {
+	var admin model.User
+	err := db.Collection(col).FindOne(context.Background(), bson.M{"user_name": username}).Decode(&admin)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &admin, nil
+}
+
+// Fungsi untuk mendapatkan admin berdasarkan email
+func GetAdminByEmail(db *mongo.Database, col string, email string) (*model.User, error) {
+	var admin model.User
+	err := db.Collection(col).FindOne(context.Background(), bson.M{"email": email}).Decode(&admin)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &admin, nil
 }
