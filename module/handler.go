@@ -65,7 +65,7 @@ func InsertAdmin(db *mongo.Database, col string, username, password, email strin
 	}
 
 	admin := bson.M{
-		"user_name": username,
+		"username": username,
 		"email":     email,
 		"password":  string(hashedPassword),
 	}
@@ -82,7 +82,7 @@ func InsertAdmin(db *mongo.Database, col string, username, password, email strin
 // Fungsi untuk mendapatkan admin berdasarkan username
 func GetAdminByUsername(db *mongo.Database, col string, username string) (*model.User, error) {
 	var admin model.User
-	err := db.Collection(col).FindOne(context.Background(), bson.M{"user_name": username}).Decode(&admin)
+	err := db.Collection(col).FindOne(context.Background(), bson.M{"username": username}).Decode(&admin)
 	if err == mongo.ErrNoDocuments {
 		return nil, nil
 	}
