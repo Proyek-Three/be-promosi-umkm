@@ -41,11 +41,9 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"category_name": bson.M{
 			"category_name": product.CategoryName.CategoryName, // Pastikan properti ini sesuai struct Category
 		},
-		"store_name": bson.M{
+		"store": bson.M{
 			"store_name": product.StoreName.StoreName, // Pastikan properti ini sesuai struct Store
-		},
-		"address": bson.M{
-			"address": product.Address.Address, // Pastikan properti ini sesuai struct Store (dengan Address)
+			"address":    product.Address.Address,     // Pastikan properti ini sesuai struct Store (dengan Address)
 		},
 	}
 	result, err := db.Collection(col).InsertOne(context.Background(), productdata)
