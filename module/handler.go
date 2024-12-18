@@ -104,3 +104,9 @@ func GetAdminByEmail(db *mongo.Database, col string, email string) (*model.User,
 	}
 	return &admin, nil
 }
+
+func ValidatePassword(hashedPassword, plainPassword string) bool {
+	// Gunakan bcrypt untuk membandingkan hash password
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+	return err == nil // Jika tidak ada error, password valid
+}
