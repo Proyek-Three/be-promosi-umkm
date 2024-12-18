@@ -44,9 +44,9 @@ type Category struct {
 // Model untuk User
 type User struct {
 	ID       string `bson:"_id,omitempty" json:"id"`
-	Username string `bson:"username" json:"username"`
-	Email    string `bson:"email" json:"email"`
-	Password string `bson:"password" json:"-"`
+	Username string `bson:"username,omitempty" json:"username"`
+	Email    string `bson:"email,omitempty" json:"email"`
+	Password string `bson:"password,omitempty" json:"password"`
 }
 
 // Model untuk permintaan registrasi
