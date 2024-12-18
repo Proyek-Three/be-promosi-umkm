@@ -80,22 +80,14 @@ func InsertAdmin(db *mongo.Database, col string, username, password, email strin
 }
 
 // Fungsi untuk mendapatkan admin berdasarkan username
-func GetAdminByUsername(db *mongo.Database, col string, username string) (*model.User, error) {
+func GetAdminByUsernameOrEmail(db *mongo.Database, col, username, email string) (*model.User, error) {
 	var admin model.User
-	err := db.Collection(col).FindOne(context.Background(), bson.M{"username": username}).Decode(&admin)
-	if err == mongo.ErrNoDocuments {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	return &admin, nil
-}
-
-// Fungsi untuk mendapatkan admin berdasarkan email
-func GetAdminByEmail(db *mongo.Database, col string, email string) (*model.User, error) {
-	var admin model.User
-	err := db.Collection(col).FindOne(context.Background(), bson.M{"email": email}).Decode(&admin)
+	err := db.Collection(col).FindOne(context.Background(), bson.M{
+		"$or": []bson.M{
+			{"username": username},
+			{"email": email},
+		},
+	}).Decode(&admin)
 	if err == mongo.ErrNoDocuments {
 		return nil, nil
 	}
