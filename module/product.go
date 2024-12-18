@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	// "time"
 
 	"github.com/Proyek-Three/be-promosi-umkm/model"
@@ -11,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
 )
 
 func MongoConnect(dbname string) (db *mongo.Database) {
@@ -34,13 +34,17 @@ func InsertOneDoc(db string, collection string, doc interface{}) (insertedID int
 func InsertProduct(db *mongo.Database, col string, product model.Product) (insertedID primitive.ObjectID, err error) {
 	// Membuat dokumen BSON untuk disimpan di MongoDB
 	productdata := bson.M{
-		"product_name":  product.ProductName,
-		"deskripsi":     product.Description,
-		"image":         product.Image,
-		"price":         product.Price,
-		"category_name": product.CategoryName.CategoryName,
-		"store_name":    product.StoreName.StoreName,
-		"address":       product.Address.Address,
+		"product_name": product.ProductName,
+		"description":  product.Description,
+		"image":        product.Image,
+		"price":        product.Price,
+		"category_name": bson.M{
+			"category_name": product.CategoryName.CategoryName, // Pastikan properti ini sesuai struct Category
+		},
+		"store": bson.M{
+			"store_name": product.StoreName.StoreName, // Pastikan properti ini sesuai struct Store
+			"address":    product.Address.Address,     // Pastikan properti ini sesuai struct Store (dengan Address)
+		},
 	}
 	result, err := db.Collection(col).InsertOne(context.Background(), productdata)
 	if err != nil { //Jika terjadi kesalahan saat menyisipkan dokumen, maka akan mengembalikan pesan kesalahan
