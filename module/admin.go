@@ -1,12 +1,14 @@
 package module
 
 import (
-    "github.com/gofiber/fiber/v2"
-    "github.com/gofiber/fiber/v2/middleware/logger" 
+    "github.com/Proyek-Three/be-promosi-umkm/model"
 )
 
-func main() {
-    r := fiber.New()
-    r.Use(logger.New())
-    r.Listen(":8080")
+var AdminCredentials = model.Admin{
+	Username: "admin",
+	Password: "admin123",
+}
+
+func ValidateAdmin(input model.Admin) bool {
+	return input.Username == AdminCredentials.Username && input.Password == AdminCredentials.Password
 }
