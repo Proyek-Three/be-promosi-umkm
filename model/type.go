@@ -56,7 +56,7 @@ type UserRequest struct {
 	Password string `json:"password"`
 }
 
-type LoginRequest struct {
+type Admin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
