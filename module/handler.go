@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"time"
-
 	"github.com/Proyek-Three/be-promosi-umkm/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -102,3 +101,4 @@ func ValidatePassword(hashedPassword, plainPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
 	return err == nil // Jika tidak ada error, password valid
 }
+
