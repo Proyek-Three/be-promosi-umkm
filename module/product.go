@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	// "time"
 
@@ -32,27 +33,44 @@ func InsertOneDoc(db string, collection string, doc interface{}) (insertedID int
 
 // INSERT PRODUCT
 func InsertProduct(db *mongo.Database, col string, product model.Product) (insertedID primitive.ObjectID, err error) {
-	// Membuat dokumen BSON untuk disimpan di MongoDB
-	productdata := bson.M{
+	// Logging untuk memastikan data diterima dengan benar
+	fmt.Printf("Inserting product: %+v\n", product)
+
+	// Menyusun dokumen BSON untuk produk
+	productData := bson.M{
 		"product_name": product.ProductName,
 		"description":  product.Description,
 		"image":        product.Image,
 		"price":        product.Price,
 		"category_name": bson.M{
-			"category_name": product.CategoryName.CategoryName, // Pastikan properti ini sesuai struct Category
+			"category_name": product.CategoryName.CategoryName,
 		},
-		"store": bson.M{
-			"store_name": product.StoreName.StoreName, // Pastikan properti ini sesuai struct Store
-			"address":    product.Address.Address,     // Pastikan properti ini sesuai struct Store (dengan Address)
+		"store_name": bson.M{
+			"store_name": product.StoreName.StoreName,
+			"address":    product.StoreName.Address,
+		},
+		"address": bson.M{
+			"store_name": product.Address.StoreName,
+			"address":    product.Address.Address,
 		},
 	}
-	result, err := db.Collection(col).InsertOne(context.Background(), productdata)
-	if err != nil { //Jika terjadi kesalahan saat menyisipkan dokumen, maka akan mengembalikan pesan kesalahan
-		fmt.Printf("InsertProduct: %v\n", err) //mencetak pesan kesalahan ke console
+
+	// Menyisipkan data ke koleksi MongoDB
+	collection := db.Collection(col)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, err := collection.InsertOne(ctx, productData)
+	if err != nil {
+		// Logging kesalahan jika terjadi
+		fmt.Printf("Error inserting product: %v\n", err)
 		return
 	}
-	insertedID = result.InsertedID.(primitive.ObjectID) //Mengambil ID dari dokumen yang baru saja disisipkan dan mengubahnya ke tipe primitive.ObjectID.
-	return insertedID, nil                              //mengembalikan insertedID dan nil sebagai nilai err jika tidak ada kesalahan.
+
+	// Mengambil ID dokumen yang baru disisipkan
+	insertedID = result.InsertedID.(primitive.ObjectID)
+	fmt.Printf("Product inserted with ID: %v\n", insertedID)
+	return insertedID, nil
 }
 
 // ALL

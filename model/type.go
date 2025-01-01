@@ -28,17 +28,13 @@ type Product struct {
 	Address      Store              `bson:"address,omitempty" json:"address,omitempty"`
 }
 
-// Store represents the table Store
-type Store struct {
-	ID        int    `json:"_id,omitempty" bson:"id,omitempty"`
-	StoreName string `json:"store_name,omitempty" bson:"store_name,omitempty"`
-	Address   string `json:"address,omitempty" bson:"address,omitempty"`
+type Category struct {
+	CategoryName string `bson:"category_name,omitempty" json:"category_name,omitempty"`
 }
 
-// Category represents the table Category
-type Category struct {
-	ID           int    `json:"id,omitempty" bson:"id,omitempty" gorm:"primaryKey;autoIncrement"`
-	CategoryName string `json:"category_name,omitempty" bson:"category_name,omitempty"`
+type Store struct {
+	StoreName string `json:"store_name,omitempty" bson:"store_name,omitempty"`
+	Address   string `json:"address,omitempty" bson:"address,omitempty"`
 }
 
 // Model untuk User
