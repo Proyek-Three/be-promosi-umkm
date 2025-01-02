@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	// "time"
 
@@ -43,13 +42,13 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"image":        product.Image,
 		"price":        product.Price,
 		"category": bson.M{
-			"_id":           product.CategoryName.ID,
-			"category_name": product.CategoryName.CategoryName,
+			"_id":           product.Category.ID,
+			"category_name": product.Category.CategoryName,
 		},
 		"store": bson.M{
-			"_id":        product.StoreName.ID,
-			"store_name": product.StoreName.StoreName,
-			"address":    product.StoreName.Address,
+			"_id":        product.Store.ID,
+			"store_name": product.Store.StoreName,
+			"address":    product.Store.Address,
 		},
 	}
 
@@ -61,9 +60,14 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 	}
 
 	// Mengembalikan ID yang baru di-insert
-	insertedID = result.InsertedID.(primitive.ObjectID)
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return primitive.NilObjectID, fmt.Errorf("failed to convert inserted ID to ObjectID")
+	}
+
 	return insertedID, nil
 }
+
 
 
 

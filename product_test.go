@@ -21,30 +21,31 @@ func TestInsertProduct(t *testing.T) {
 	categoryID := primitive.NewObjectID()
 	storeID := primitive.NewObjectID()
 
-	var product_category = model.Category{
-		ID:           categoryID, // Tambahkan ID kategori
+	// Buat data kategori
+	productCategory := model.Category{
+		ID:           categoryID,
 		CategoryName: "Makanan",
 	}
 
-	var store = model.Store{
-		ID:        storeID, // Tambahkan ID toko
+	// Buat data toko
+	store := model.Store{
+		ID:        storeID,
 		StoreName: "Food Store",
 		Address:   "Jl. Sudirman No. 1 Jakarta Pusat",
 	}
 
 	// Buat data produk
-	productdata := model.Product{
-		ProductName:  productName,
-		Description:  description,
-		Image:        image,
-		Price:        price,
-		CategoryName: product_category,
-		StoreName:    store,
-		Address:      store,
+	productData := model.Product{
+		ProductName: productName,
+		Description: description,
+		Image:       image,
+		Price:       price,
+		Category:    productCategory,
+		Store:       store,
 	}
 
 	// Simpan produk ke MongoDB
-	insertedID, err := module.InsertProduct(module.MongoConn, "product", productdata)
+	insertedID, err := module.InsertProduct(module.MongoConn, "product", productData)
 	if err != nil {
 		t.Errorf("Error inserting data: %v", err)
 	}
@@ -57,6 +58,7 @@ func TestInsertProduct(t *testing.T) {
 	// Tampilkan hasil
 	fmt.Printf("Data berhasil disimpan dengan ID: %s\n", insertedID.Hex())
 }
+
 
 
 // BY ID
