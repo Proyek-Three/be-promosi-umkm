@@ -29,13 +29,16 @@ type Product struct {
 }
 
 type Category struct {
-	CategoryName string `bson:"category_name,omitempty" json:"category_name,omitempty"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` 
+	CategoryName string             `bson:"category_name,omitempty" json:"category_name,omitempty"`
 }
 
 type Store struct {
-	StoreName string `json:"store_name,omitempty" bson:"store_name,omitempty"`
-	Address   string `json:"address,omitempty" bson:"address,omitempty"`
+	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` 
+	StoreName string             `json:"store_name,omitempty" bson:"store_name,omitempty"`
+	Address   string             `json:"address,omitempty" bson:"address,omitempty"`
 }
+
 
 // Model untuk User
 type User struct {
