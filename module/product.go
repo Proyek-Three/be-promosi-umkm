@@ -42,36 +42,31 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"description":  product.Description,
 		"image":        product.Image,
 		"price":        product.Price,
-		"category_name": bson.M{
+		"category": bson.M{
+			"_id":           product.CategoryName.ID,
 			"category_name": product.CategoryName.CategoryName,
 		},
-		"store_name": bson.M{
+		"store": bson.M{
+			"_id":        product.StoreName.ID,
 			"store_name": product.StoreName.StoreName,
 			"address":    product.StoreName.Address,
 		},
-		"address": bson.M{
-			"store_name": product.Address.StoreName,
-			"address":    product.Address.Address,
-		},
 	}
 
-	// Menyisipkan data ke koleksi MongoDB
+	// Melakukan insert ke MongoDB
 	collection := db.Collection(col)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	result, err := collection.InsertOne(ctx, productData)
+	result, err := collection.InsertOne(context.TODO(), productData)
 	if err != nil {
-		// Logging kesalahan jika terjadi
-		fmt.Printf("Error inserting product: %v\n", err)
-		return
+		return primitive.NilObjectID, err
 	}
 
-	// Mengambil ID dokumen yang baru disisipkan
+	// Mengembalikan ID yang baru di-insert
 	insertedID = result.InsertedID.(primitive.ObjectID)
-	fmt.Printf("Product inserted with ID: %v\n", insertedID)
 	return insertedID, nil
 }
+
+
+
 
 // ALL
 func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {

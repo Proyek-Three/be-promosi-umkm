@@ -18,26 +18,27 @@ type Users struct {
 
 // Product represents the table Produk
 type Product struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	ProductName  string             `json:"product_name,omitempty" bson:"product_name,omitempty"`
-	Description  string             `json:"description,omitempty" bson:"description,omitempty"`
-	Image        string             `json:"image,omitempty" bson:"image,omitempty"`
-	Price        float64            `json:"price,omitempty" bson:"price,omitempty"`
-	CategoryName Category           `bson:"category_name,omitempty" json:"category_name,omitempty"`
-	StoreName    Store              `bson:"store_name,omitempty" json:"store_name,omitempty"`
-	Address      Store              `bson:"address,omitempty" json:"address,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	ProductName string             `json:"product_name,omitempty" bson:"product_name,omitempty"`
+	Description string             `json:"description,omitempty" bson:"description,omitempty"`
+	Image       string             `json:"image,omitempty" bson:"image,omitempty"`
+	Price       float64            `json:"price,omitempty" bson:"price,omitempty"`
+	Category    Category           `bson:"category,omitempty" json:"category,omitempty"`
+	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
 }
 
 type Category struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` 
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	CategoryName string             `bson:"category_name,omitempty" json:"category_name,omitempty"`
 }
 
 type Store struct {
-	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` 
+	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	StoreName string             `json:"store_name,omitempty" bson:"store_name,omitempty"`
 	Address   string             `json:"address,omitempty" bson:"address,omitempty"`
 }
+
+
 
 
 // Model untuk User

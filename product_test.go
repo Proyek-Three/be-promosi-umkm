@@ -11,20 +11,28 @@ import (
 
 // INSERT MENU
 func TestInsertProduct(t *testing.T) {
+	// Mock data untuk pengujian
 	productName := "Dimsum"
-	description := "makanan dengan rasa spesial"
+	description := "Makanan dengan rasa spesial"
 	image := "image.jpg"
 	price := 10000.0
 
+	// Buat ID kategori dan toko
+	categoryID := primitive.NewObjectID()
+	storeID := primitive.NewObjectID()
+
 	var product_category = model.Category{
+		ID:           categoryID, // Tambahkan ID kategori
 		CategoryName: "Makanan",
 	}
 
 	var store = model.Store{
+		ID:        storeID, // Tambahkan ID toko
 		StoreName: "Food Store",
 		Address:   "Jl. Sudirman No. 1 Jakarta Pusat",
 	}
 
+	// Buat data produk
 	productdata := model.Product{
 		ProductName:  productName,
 		Description:  description,
@@ -35,12 +43,21 @@ func TestInsertProduct(t *testing.T) {
 		Address:      store,
 	}
 
+	// Simpan produk ke MongoDB
 	insertedID, err := module.InsertProduct(module.MongoConn, "product", productdata)
 	if err != nil {
 		t.Errorf("Error inserting data: %v", err)
 	}
-	fmt.Printf("Data berhasil disimpan dengan id %s", insertedID.Hex())
+
+	// Pastikan ID yang dihasilkan valid
+	if insertedID.IsZero() {
+		t.Errorf("Inserted ID is zero")
+	}
+
+	// Tampilkan hasil
+	fmt.Printf("Data berhasil disimpan dengan ID: %s\n", insertedID.Hex())
 }
+
 
 // BY ID
 func TestGetProductFromID(t *testing.T) {
