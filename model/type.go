@@ -19,10 +19,10 @@ type Users struct {
 // Product represents the table Produk
 type Product struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	ProductName string             `json:"product_name,omitempty" bson:"product_name,omitempty"`
-	Description string             `json:"description,omitempty" bson:"description,omitempty"`
-	Image       string             `json:"image,omitempty" bson:"image,omitempty"`
-	Price       float64            `json:"price,omitempty" bson:"price,omitempty"`
+	ProductName string             `bson:"product_name,omitempty" json:"product_name,omitempty"`
+	Description string             `bson:"description,omitempty" json:"description,omitempty"`
+	Image       string             `bson:"image,omitempty" json:"image,omitempty"`
+	Price       float64            `bson:"price,omitempty" json:"price,omitempty"`
 	Category    Category           `bson:"category,omitempty" json:"category,omitempty"`
 	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
 }

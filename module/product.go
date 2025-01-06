@@ -35,6 +35,16 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 	// Logging untuk memastikan data diterima dengan benar
 	fmt.Printf("Inserting product: %+v\n", product)
 
+	// Validasi dan konversi ID kategori
+	if product.Category.ID.IsZero() {
+		return primitive.NilObjectID, fmt.Errorf("invalid category ID: cannot be empty")
+	}
+
+	// Validasi dan konversi ID toko
+	if product.Store.ID.IsZero() {
+		return primitive.NilObjectID, fmt.Errorf("invalid store ID: cannot be empty")
+	}
+
 	// Menyusun dokumen BSON untuk produk
 	productData := bson.M{
 		"product_name": product.ProductName,
@@ -56,6 +66,7 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 	collection := db.Collection(col)
 	result, err := collection.InsertOne(context.TODO(), productData)
 	if err != nil {
+		fmt.Printf("InsertProduct error: %v\n", err)
 		return primitive.NilObjectID, err
 	}
 
@@ -67,6 +78,7 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 
 	return insertedID, nil
 }
+
 
 
 
