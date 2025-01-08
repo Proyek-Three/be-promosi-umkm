@@ -112,68 +112,56 @@ func GetProductFromID(_id primitive.ObjectID, db *mongo.Database, col string) (p
 	return product, nil
 }
 
-func UpdateProduct(
-	db *mongo.Database, 
-	col string, 
-	id primitive.ObjectID, 
-	ProductName string, 
-	Description string, 
-	Image string, 
-	Price float64, 
-	Category model.Category, 
-	StoreID primitive.ObjectID,
-) error {
-	// Cari store berdasarkan ID
-	var store model.Store
-	err := db.Collection("stores").FindOne(context.TODO(), bson.M{"_id": StoreID}).Decode(&store)
-	if err != nil {
-		return fmt.Errorf("store ID not found: %w", err)
+func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID, updatedProduct model.Product) error {
+	// Logging untuk debugging
+	fmt.Printf("Updating product ID: %s with data: %+v\n", productID.Hex(), updatedProduct)
+
+	// Validasi ID kategori
+	if updatedProduct.Category.ID.IsZero() {
+		return fmt.Errorf("invalid category ID: cannot be empty")
 	}
 
-	// Cari kategori berdasarkan ID (opsional, jika ingin konsisten)
-	var category model.Category
-	if !Category.ID.IsZero() {
-		err = db.Collection("categories").FindOne(context.TODO(), bson.M{"_id": Category.ID}).Decode(&category)
-		if err != nil {
-			return fmt.Errorf("category ID not found: %w", err)
-		}
-		Category.CategoryName = category.CategoryName
+	// Validasi ID toko
+	if updatedProduct.Store.ID.IsZero() {
+		return fmt.Errorf("invalid store ID: cannot be empty")
 	}
 
-	// Filter dokumen berdasarkan ID
-	filter := bson.M{"_id": id}
-
-	// Update dokumen
-	update := bson.M{
+	// Menyusun dokumen BSON untuk pembaruan
+	updateData := bson.M{
 		"$set": bson.M{
-			"product_name": ProductName,
-			"description":  Description,
-			"image":        Image,
-			"price":        Price,
+			"product_name": updatedProduct.ProductName,
+			"description":  updatedProduct.Description,
+			"image":        updatedProduct.Image,
+			"price":        updatedProduct.Price,
 			"category": bson.M{
-				"_id":           Category.ID,
-				"category_name": Category.CategoryName,
+				"_id":           updatedProduct.Category.ID,
+				"category_name": updatedProduct.Category.CategoryName,
 			},
 			"store": bson.M{
-				"_id":        store.ID,
-				"store_name": store.StoreName,
-				"address":    store.Address,
+				"_id":        updatedProduct.Store.ID,
+				"store_name": updatedProduct.Store.StoreName,
+				"address":    updatedProduct.Store.Address,
 			},
 		},
 	}
 
-	// Eksekusi update
-	result, err := db.Collection(col).UpdateOne(context.TODO(), filter, update)
+	// Mendapatkan koleksi dan memperbarui dokumen
+	collection := db.Collection(col)
+	filter := bson.M{"_id": productID}
+	result, err := collection.UpdateOne(context.TODO(), filter, updateData)
 	if err != nil {
 		return fmt.Errorf("failed to update product: %w", err)
 	}
 
-	if result.ModifiedCount == 0 {
-		return fmt.Errorf("no data has been changed with the specified ID")
+	// Memastikan ada dokumen yang diperbarui
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("no product found with ID: %s", productID.Hex())
 	}
 
+	fmt.Printf("Successfully updated product ID: %s\n", productID.Hex())
 	return nil
 }
+
 
 
 
