@@ -9,8 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// INSERT USER
-func InsertUser(db *mongo.Database, col string, user DataUsers) (insertedID primitive.ObjectID, err error) {
+
+func InsertUser(db *mongo.Database, col string, user model.DataUsers) (insertedID primitive.ObjectID, err error) {
 	if user.Username == "" || user.Password == "" {
 		return primitive.NilObjectID, fmt.Errorf("username and password cannot be empty")
 	}
@@ -30,8 +30,8 @@ func InsertUser(db *mongo.Database, col string, user DataUsers) (insertedID prim
 	return insertedID, nil
 }
 
-// GET ALL USERS
-func GetAllUsers(db *mongo.Database, col string) (data []DataUsers, err error) {
+
+func GetAllUsers(db *mongo.Database, col string) (data []model.DataUsers, err error) {
 	collection := db.Collection(col)
 	cursor, err := collection.Find(context.TODO(), bson.M{})
 	if err != nil {
@@ -45,8 +45,8 @@ func GetAllUsers(db *mongo.Database, col string) (data []DataUsers, err error) {
 	return data, nil
 }
 
-// GET USER BY ID
-func GetUserByID(_id primitive.ObjectID, db *mongo.Database, col string) (user DataUsers, err error) {
+
+func GetUserByID(_id primitive.ObjectID, db *mongo.Database, col string) (user model.DataUsers, err error) {
 	collection := db.Collection(col)
 	filter := bson.M{"_id": _id}
 	err = collection.FindOne(context.TODO(), filter).Decode(&user)
@@ -59,8 +59,8 @@ func GetUserByID(_id primitive.ObjectID, db *mongo.Database, col string) (user D
 	return user, nil
 }
 
-// UPDATE USER
-func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updatedUser DataUsers) error {
+
+func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updatedUser model.DataUsers) error {
 	if updatedUser.Username == "" || updatedUser.Password == "" {
 		return fmt.Errorf("username and password cannot be empty")
 	}
@@ -90,7 +90,7 @@ func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updat
 	return nil
 }
 
-// DELETE USER BY ID
+
 func DeleteUserByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
 	collection := db.Collection(col)
 	filter := bson.M{"_id": _id}
