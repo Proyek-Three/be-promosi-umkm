@@ -62,11 +62,11 @@ type Admin struct {
 }
 
 type DataUsers struct {
-	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Username    string             `json:"username,omitempty" bson:"username,omitempty" gorm:"unique;not null"`
-	Password    string             `json:"password,omitempty" bson:"password,omitempty"`
-	PhoneNumber string             `json:"phone_number,omitempty" bson:"phone_number,omitempty"`
-	Email       string             `json:"email,omitempty" bson:"email,omitempty"`
-	StoreName   string             `json:"store_name,omitempty" bson:"store_name,omitempty"`
-	StoreAddress string            `json:"store_address,omitempty" bson:"store_address,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Username    string             `bson:"username,omitempty" json:"username,omitempty"`
+	Password    string             `bson:"password,omitempty" json:"password,omitempty"`
+	PhoneNumber string             `bson:"phone_number,omitempty" json:"phone_number,omitempty"`
+	Email       string             `bson:"email,omitempty" json:"email,omitempty"`
+	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
 }
+

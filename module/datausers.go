@@ -16,6 +16,7 @@ func InsertUser(db *mongo.Database, col string, user model.DataUsers) (insertedI
 	}
 
 	user.ID = primitive.NewObjectID()
+	user.Store.ID = primitive.NewObjectID() // Tambahkan ID untuk Store jika belum ada
 	collection := db.Collection(col)
 	result, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
@@ -67,12 +68,12 @@ func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updat
 
 	updateData := bson.M{
 		"$set": bson.M{
-			"username":      updatedUser.Username,
-			"password":      updatedUser.Password,
-			"phone_number":  updatedUser.PhoneNumber,
-			"email":         updatedUser.Email,
-			"store_name":    updatedUser.StoreName,
-			"store_address": updatedUser.StoreAddress,
+			"username":        updatedUser.Username,
+			"password":        updatedUser.Password,
+			"phone_number":    updatedUser.PhoneNumber,
+			"email":           updatedUser.Email,
+			"store.store_name": updatedUser.Store.StoreName,
+			"store.address":   updatedUser.Store.Address,
 		},
 	}
 
