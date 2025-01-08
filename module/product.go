@@ -112,7 +112,6 @@ func GetProductFromID(_id primitive.ObjectID, db *mongo.Database, col string) (p
 	return product, nil
 }
 
-// UPDATE
 func UpdateProduct(
 	db *mongo.Database, 
 	col string, 
@@ -122,12 +121,29 @@ func UpdateProduct(
 	Image string, 
 	Price float64, 
 	Category model.Category, 
-	Store model.Store,
+	StoreID primitive.ObjectID,
 ) error {
+	// Cari store berdasarkan ID
+	var store model.Store
+	err := db.Collection("stores").FindOne(context.TODO(), bson.M{"_id": StoreID}).Decode(&store)
+	if err != nil {
+		return fmt.Errorf("store ID not found: %w", err)
+	}
+
+	// Cari kategori berdasarkan ID (opsional, jika ingin konsisten)
+	var category model.Category
+	if !Category.ID.IsZero() {
+		err = db.Collection("categories").FindOne(context.TODO(), bson.M{"_id": Category.ID}).Decode(&category)
+		if err != nil {
+			return fmt.Errorf("category ID not found: %w", err)
+		}
+		Category.CategoryName = category.CategoryName
+	}
+
 	// Filter dokumen berdasarkan ID
 	filter := bson.M{"_id": id}
 
-	// Update dokumen dengan data baru
+	// Update dokumen
 	update := bson.M{
 		"$set": bson.M{
 			"product_name": ProductName,
@@ -139,27 +155,26 @@ func UpdateProduct(
 				"category_name": Category.CategoryName,
 			},
 			"store": bson.M{
-				"_id":        Store.ID,
-				"store_name": Store.StoreName,
-				"address":    Store.Address,
+				"_id":        store.ID,
+				"store_name": store.StoreName,
+				"address":    store.Address,
 			},
 		},
 	}
 
-	// Eksekusi update pada koleksi
+	// Eksekusi update
 	result, err := db.Collection(col).UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		fmt.Printf("UpdateProduct: %v\n", err)
 		return fmt.Errorf("failed to update product: %w", err)
 	}
 
-	// Validasi apakah ada dokumen yang diubah
 	if result.ModifiedCount == 0 {
 		return fmt.Errorf("no data has been changed with the specified ID")
 	}
 
 	return nil
 }
+
 
 
 func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
