@@ -2,7 +2,6 @@ package module
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	
 	// "time"
@@ -32,15 +31,15 @@ func InsertOneDoc(db string, collection string, doc interface{}) (insertedID int
 
 // INSERT PRODUCT
 func InsertProduct(db *mongo.Database, col string, product model.Product) (insertedID primitive.ObjectID, err error) {
-	// Logging untuk memastikan data diterima dengan benar
+	// Logging untuk debugging
 	fmt.Printf("Inserting product: %+v\n", product)
 
-	// Validasi dan konversi ID kategori
+	// Validasi ID kategori
 	if product.Category.ID.IsZero() {
 		return primitive.NilObjectID, fmt.Errorf("invalid category ID: cannot be empty")
 	}
 
-	// Validasi dan konversi ID toko
+	// Validasi ID toko
 	if product.Store.ID.IsZero() {
 		return primitive.NilObjectID, fmt.Errorf("invalid store ID: cannot be empty")
 	}
@@ -62,22 +61,22 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		},
 	}
 
-	// Melakukan insert ke MongoDB
+	// Menyisipkan dokumen ke MongoDB
 	collection := db.Collection(col)
 	result, err := collection.InsertOne(context.TODO(), productData)
 	if err != nil {
-		fmt.Printf("InsertProduct error: %v\n", err)
-		return primitive.NilObjectID, err
+		return primitive.NilObjectID, fmt.Errorf("failed to insert product: %w", err)
 	}
 
-	// Mengembalikan ID yang baru di-insert
+	// Mendapatkan ID yang disisipkan
 	insertedID, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return primitive.NilObjectID, fmt.Errorf("failed to convert inserted ID to ObjectID")
+		return primitive.NilObjectID, fmt.Errorf("failed to parse inserted ID")
 	}
 
 	return insertedID, nil
 }
+
 
 
 
@@ -114,30 +113,54 @@ func GetProductFromID(_id primitive.ObjectID, db *mongo.Database, col string) (p
 }
 
 // UPDATE
-func UpdateProduct(db *mongo.Database, col string, id primitive.ObjectID, ProductName string, Description string, Image string, Price float64, CategoryName model.Category, StoreName model.Store, Address model.Store) (err error) {
+func UpdateProduct(
+	db *mongo.Database, 
+	col string, 
+	id primitive.ObjectID, 
+	ProductName string, 
+	Description string, 
+	Image string, 
+	Price float64, 
+	Category model.Category, 
+	Store model.Store,
+) error {
+	// Filter dokumen berdasarkan ID
 	filter := bson.M{"_id": id}
+
+	// Update dokumen dengan data baru
 	update := bson.M{
 		"$set": bson.M{
-			"product_name":  ProductName,
-			"description":   Description,
-			"image":         Image,
-			"price":         Price,
-			"category_name": CategoryName,
-			"store_name":    StoreName,
-			"address":       Address,
+			"product_name": ProductName,
+			"description":  Description,
+			"image":        Image,
+			"price":        Price,
+			"category": bson.M{
+				"_id":           Category.ID,
+				"category_name": Category.CategoryName,
+			},
+			"store": bson.M{
+				"_id":        Store.ID,
+				"store_name": Store.StoreName,
+				"address":    Store.Address,
+			},
 		},
 	}
-	result, err := db.Collection(col).UpdateOne(context.Background(), filter, update)
+
+	// Eksekusi update pada koleksi
+	result, err := db.Collection(col).UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Printf("UpdateProduct: %v\n", err)
-		return
+		return fmt.Errorf("failed to update product: %w", err)
 	}
+
+	// Validasi apakah ada dokumen yang diubah
 	if result.ModifiedCount == 0 {
-		err = errors.New("no data has been changed with the specified ID")
-		return
+		return fmt.Errorf("no data has been changed with the specified ID")
 	}
+
 	return nil
 }
+
 
 func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
 	productdata := db.Collection(col)
