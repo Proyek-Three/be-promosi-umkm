@@ -10,13 +10,26 @@ import (
 )
 
 
-func InsertUser(db *mongo.Database, col string, user model.DataUsers) (insertedID primitive.ObjectID, err error) {
+func InsertUser(db *mongo.Database, col string, user model.DataUsers, storeID primitive.ObjectID) (insertedID primitive.ObjectID, err error) {
 	if user.Username == "" || user.Password == "" {
 		return primitive.NilObjectID, fmt.Errorf("username and password cannot be empty")
 	}
 
+	// Periksa apakah store_id valid
+	storeCollection := db.Collection("stores")
+	var store model.Store
+	err = storeCollection.FindOne(context.TODO(), bson.M{"_id": storeID}).Decode(&store)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return primitive.NilObjectID, fmt.Errorf("store with ID %s not found", storeID.Hex())
+		}
+		return primitive.NilObjectID, fmt.Errorf("failed to fetch store: %w", err)
+	}
+
+	// Tambahkan informasi store ke user
 	user.ID = primitive.NewObjectID()
-	user.Store.ID = primitive.NewObjectID() // Tambahkan ID untuk Store jika belum ada
+	user.Store = store
+
 	collection := db.Collection(col)
 	result, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
@@ -61,19 +74,30 @@ func GetUserByID(_id primitive.ObjectID, db *mongo.Database, col string) (user m
 }
 
 
-func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updatedUser model.DataUsers) error {
+func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updatedUser model.DataUsers, storeID primitive.ObjectID) error {
 	if updatedUser.Username == "" || updatedUser.Password == "" {
 		return fmt.Errorf("username and password cannot be empty")
 	}
 
+	// Periksa apakah store_id valid
+	storeCollection := db.Collection("stores")
+	var store model.Store
+	err := storeCollection.FindOne(context.TODO(), bson.M{"_id": storeID}).Decode(&store)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return fmt.Errorf("store with ID %s not found", storeID.Hex())
+		}
+		return fmt.Errorf("failed to fetch store: %w", err)
+	}
+
+	// Siapkan data untuk update
 	updateData := bson.M{
 		"$set": bson.M{
 			"username":        updatedUser.Username,
 			"password":        updatedUser.Password,
 			"phone_number":    updatedUser.PhoneNumber,
 			"email":           updatedUser.Email,
-			"store.store_name": updatedUser.Store.StoreName,
-			"store.address":   updatedUser.Store.Address,
+			"store":           store,
 		},
 	}
 
