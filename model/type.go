@@ -25,7 +25,14 @@ type Product struct {
 	Price       float64            `bson:"price,omitempty" json:"price,omitempty"`
 	Category    Category           `bson:"category,omitempty" json:"category,omitempty"`
 	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
+	Status      Status             `bson:"status,omitempty" json:"status,omitempty"`
 }
+
+type Status struct {
+	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Status string             `bson:"status,omitempty" json:"status,omitempty"`
+}
+
 
 type Category struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
@@ -37,9 +44,6 @@ type Store struct {
 	StoreName string             `json:"store_name,omitempty" bson:"store_name,omitempty"`
 	Address   string             `json:"address,omitempty" bson:"address,omitempty"`
 }
-
-
-
 
 // Model untuk User
 type User struct {

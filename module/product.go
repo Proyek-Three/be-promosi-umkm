@@ -44,6 +44,11 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		return primitive.NilObjectID, fmt.Errorf("invalid store ID: cannot be empty")
 	}
 
+	// Validasi ID status
+	if product.Status.ID.IsZero() {
+		return primitive.NilObjectID, fmt.Errorf("invalid status ID: cannot be empty")
+	}
+
 	// Menyusun dokumen BSON untuk produk
 	productData := bson.M{
 		"product_name": product.ProductName,
@@ -58,6 +63,10 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 			"_id":        product.Store.ID,
 			"store_name": product.Store.StoreName,
 			"address":    product.Store.Address,
+		},
+		"status": bson.M{
+			"_id":    product.Status.ID,
+			"status": product.Status.Status,
 		},
 	}
 
@@ -76,6 +85,7 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 
 	return insertedID, nil
 }
+
 
 
 
@@ -126,6 +136,11 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 		return fmt.Errorf("invalid store ID: cannot be empty")
 	}
 
+	// Validasi ID status
+	if updatedProduct.Status.ID.IsZero() {
+		return fmt.Errorf("invalid status ID: cannot be empty")
+	}
+
 	// Menyusun dokumen BSON untuk pembaruan
 	updateData := bson.M{
 		"$set": bson.M{
@@ -141,6 +156,10 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 				"_id":        updatedProduct.Store.ID,
 				"store_name": updatedProduct.Store.StoreName,
 				"address":    updatedProduct.Store.Address,
+			},
+			"status": bson.M{
+				"_id":    updatedProduct.Status.ID,
+				"status": updatedProduct.Status.Status,
 			},
 		},
 	}
@@ -161,6 +180,7 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 	fmt.Printf("Successfully updated product ID: %s\n", productID.Hex())
 	return nil
 }
+
 
 
 
