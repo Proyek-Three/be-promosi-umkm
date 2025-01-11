@@ -15,21 +15,35 @@ func InsertUser(db *mongo.Database, col string, user model.DataUsers, storeID pr
 		return primitive.NilObjectID, fmt.Errorf("username and password cannot be empty")
 	}
 
-	// Periksa apakah store_id valid
-	storeCollection := db.Collection("stores")
+	// Jika Store ID tidak diberikan, buat Store baru
 	var store model.Store
-	err = storeCollection.FindOne(context.TODO(), bson.M{"_id": storeID}).Decode(&store)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return primitive.NilObjectID, fmt.Errorf("store with ID %s not found", storeID.Hex())
+	storeCollection := db.Collection("stores")
+
+	if storeID.IsZero() {
+		// Buat store baru jika ID tidak ada
+		store.ID = primitive.NewObjectID()
+		store.StoreName = user.Store.StoreName
+		store.Address = user.Store.Address
+		_, err = storeCollection.InsertOne(context.TODO(), store)
+		if err != nil {
+			return primitive.NilObjectID, fmt.Errorf("failed to create store: %w", err)
 		}
-		return primitive.NilObjectID, fmt.Errorf("failed to fetch store: %w", err)
+	} else {
+		// Periksa apakah Store ID valid
+		err = storeCollection.FindOne(context.TODO(), bson.M{"_id": storeID}).Decode(&store)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return primitive.NilObjectID, fmt.Errorf("store with ID %s not found", storeID.Hex())
+			}
+			return primitive.NilObjectID, fmt.Errorf("failed to fetch store: %w", err)
+		}
 	}
 
 	// Tambahkan informasi store ke user
 	user.ID = primitive.NewObjectID()
 	user.Store = store
 
+	// Simpan user ke database
 	collection := db.Collection(col)
 	result, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
@@ -43,6 +57,7 @@ func InsertUser(db *mongo.Database, col string, user model.DataUsers, storeID pr
 
 	return insertedID, nil
 }
+
 
 
 func GetAllUsers(db *mongo.Database, col string) (data []model.DataUsers, err error) {
@@ -79,25 +94,38 @@ func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updat
 		return fmt.Errorf("username and password cannot be empty")
 	}
 
-	// Periksa apakah store_id valid
-	storeCollection := db.Collection("stores")
+	// Jika Store ID tidak diberikan, buat Store baru
 	var store model.Store
-	err := storeCollection.FindOne(context.TODO(), bson.M{"_id": storeID}).Decode(&store)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return fmt.Errorf("store with ID %s not found", storeID.Hex())
+	storeCollection := db.Collection("stores")
+
+	if storeID.IsZero() {
+		// Buat store baru jika ID tidak ada
+		store.ID = primitive.NewObjectID()
+		store.StoreName = updatedUser.Store.StoreName
+		store.Address = updatedUser.Store.Address
+		_, err := storeCollection.InsertOne(context.TODO(), store)
+		if err != nil {
+			return fmt.Errorf("failed to create store: %w", err)
 		}
-		return fmt.Errorf("failed to fetch store: %w", err)
+	} else {
+		// Periksa apakah Store ID valid
+		err := storeCollection.FindOne(context.TODO(), bson.M{"_id": storeID}).Decode(&store)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return fmt.Errorf("store with ID %s not found", storeID.Hex())
+			}
+			return fmt.Errorf("failed to fetch store: %w", err)
+		}
 	}
 
 	// Siapkan data untuk update
 	updateData := bson.M{
 		"$set": bson.M{
-			"username":        updatedUser.Username,
-			"password":        updatedUser.Password,
-			"phone_number":    updatedUser.PhoneNumber,
-			"email":           updatedUser.Email,
-			"store":           store,
+			"username":     updatedUser.Username,
+			"password":     updatedUser.Password,
+			"phone_number": updatedUser.PhoneNumber,
+			"email":        updatedUser.Email,
+			"store":        store,
 		},
 	}
 
@@ -114,6 +142,7 @@ func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updat
 
 	return nil
 }
+
 
 
 func DeleteUserByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
