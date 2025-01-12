@@ -2,6 +2,7 @@ package model
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 
 )
 
@@ -61,9 +62,19 @@ type UserRequest struct {
 }
 
 type Admin struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	UserName string             `bson:"user_name,omitempty" json:"user_name,omitempty"`
+	Email    string             `bson:"email,omitempty" json:"email,omitempty"`
+	Password string             `bson:"password,omitempty" json:"password,omitempty"`
 }
+
+type Token struct {
+	ID        string    `bson:"_id,omitempty" json:"_id,omitempty"`
+	Token     string    `bson:"token,omitempty" json:"token,omitempty"`
+	AdminID   string    `bson:"admin_id,omitempty" json:"admin_id,omitempty"`
+	CreatedAt time.Time `bson:"created_at,omitempty" json:"created_at,omitempty"`
+}
+
 
 type DataUsers struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
