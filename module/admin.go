@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"github.com/Proyek-Three/bp-promosi-umkm/config"
 
 	"github.com/Proyek-Three/be-promosi-umkm/model"
 	"go.mongodb.org/mongo-driver/bson"
