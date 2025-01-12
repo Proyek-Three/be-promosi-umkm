@@ -85,7 +85,7 @@ func SaveTokenToDatabase(db *mongo.Database, col string, adminID string, token s
 // GetAdminByUsername retrieves an admin by their username
 func GetAdminByUsername(db *mongo.Database, username string) (*model.Admin, error) {
 	var admin model.Admin
-	err := db.Collection("Admin").FindOne(context.Background(), bson.M{"user_name": username}).Decode(&admin)
+	err := db.Collection("admin").FindOne(context.Background(), bson.M{"user_name": username}).Decode(&admin)
 	if err == mongo.ErrNoDocuments {
 		return nil, nil // Admin not found
 	}
