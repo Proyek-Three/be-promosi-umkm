@@ -49,7 +49,7 @@ func Login(db *mongo.Database, username string, password string) (string, error)
 	return token, nil
 }
 
-func SaveAdminToDatabase(db *mongo.Database, col string, username string, password string, email string) (insertedID primitive.ObjectID, err error) {
+func SaveAdminToDatabase(db *mongo.Database, col string, username string, password string) (insertedID primitive.ObjectID, err error) {
 	// Create a new admin document
 	admin := bson.M{
 		"user_name": username,
