@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Login authenticates an admin and generates a JWT token
@@ -46,6 +47,25 @@ func Login(db *mongo.Database, username string, password string) (string, error)
 	}
 
 	return token, nil
+}
+
+func SaveAdminToDatabase(db *mongo.Database, col string, username string, password string, email string) (insertedID primitive.ObjectID, err error) {
+	// Create a new admin document
+	admin := bson.M{
+		"user_name": username,
+		"password":  password, // This should be the hashed password
+	}
+
+	// Insert the admin document into the specified collection
+	result, err := db.Collection(col).InsertOne(context.Background(), admin)
+	if err != nil {
+		fmt.Printf("SaveAdminToDatabase: %v\n", err)
+		return primitive.NilObjectID, err
+	}
+
+	// Return the inserted ID
+	insertedID = result.InsertedID.(primitive.ObjectID)
+	return insertedID, nil
 }
 
 // DeleteTokenFromMongoDB deletes a token from the database
