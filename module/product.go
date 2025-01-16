@@ -3,7 +3,7 @@ package module
 import (
 	"context"
 	"fmt"
-	
+
 	// "time"
 
 	"github.com/Proyek-Three/be-promosi-umkm/model"
@@ -49,6 +49,11 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		return primitive.NilObjectID, fmt.Errorf("invalid status ID: cannot be empty")
 	}
 
+	// Validasi ID user
+	if product.User.ID.IsZero() {
+		return primitive.NilObjectID, fmt.Errorf("invalid status ID: cannot be empty")
+	}
+
 	// Menyusun dokumen BSON untuk produk
 	productData := bson.M{
 		"product_name": product.ProductName,
@@ -68,6 +73,9 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 			"_id":    product.Status.ID,
 			"status": product.Status.Status,
 		},
+		"user": bson.M{
+			"_id": product.User.ID,
+		},
 	}
 
 	// Menyisipkan dokumen ke MongoDB
@@ -86,13 +94,6 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 	return insertedID, nil
 }
 
-
-
-
-
-
-
-
 // ALL
 func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
 	productdata := db.Collection(col)
@@ -106,6 +107,32 @@ func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
 		fmt.Println(err)
 	}
 	return
+}
+
+// GetProductsByUserID mengambil produk berdasarkan user_id
+func GetProductsByUserID(db *mongo.Database, col string, userID primitive.ObjectID) []model.Product {
+	productCollection := db.Collection(col)
+
+	// Filter berdasarkan user_id
+	filter := bson.M{"user_id._id": userID}
+
+	// Query ke MongoDB
+	cursor, err := productCollection.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("Error fetching products:", err)
+		return nil
+	}
+	defer cursor.Close(context.TODO())
+
+	// Decode hasil query ke slice produk
+	var products []model.Product
+	err = cursor.All(context.TODO(), &products)
+	if err != nil {
+		fmt.Println("Error decoding products:", err)
+		return nil
+	}
+
+	return products
 }
 
 // ID
@@ -180,10 +207,6 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 	fmt.Printf("Successfully updated product ID: %s\n", productID.Hex())
 	return nil
 }
-
-
-
-
 
 func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
 	productdata := db.Collection(col)

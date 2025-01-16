@@ -1,9 +1,9 @@
 package model
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Users represents the table Users
@@ -20,6 +20,7 @@ type Users struct {
 // Product represents the table Produk
 type Product struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	User        Users              `bson:"user_id,omitempty" json:"user_id,omitempty"`
 	ProductName string             `bson:"product_name,omitempty" json:"product_name,omitempty"`
 	Description string             `bson:"description,omitempty" json:"description,omitempty"`
 	Image       string             `bson:"image,omitempty" json:"image,omitempty"`
@@ -33,7 +34,6 @@ type Status struct {
 	ID     primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Status string             `bson:"status,omitempty" json:"status,omitempty"`
 }
-
 
 type Category struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
@@ -74,7 +74,6 @@ type Token struct {
 	CreatedAt time.Time `bson:"created_at,omitempty" json:"created_at,omitempty"`
 }
 
-
 type DataUsers struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Username    string             `bson:"username,omitempty" json:"username,omitempty"`
@@ -83,4 +82,3 @@ type DataUsers struct {
 	Email       string             `bson:"email,omitempty" json:"email,omitempty"`
 	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
 }
-

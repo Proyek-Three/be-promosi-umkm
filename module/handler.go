@@ -2,8 +2,10 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
+
 	"github.com/Proyek-Three/be-promosi-umkm/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,32 +13,38 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Fungsi untuk membuat user baru
-func CreateUser(collection *mongo.Collection, username, email, password string) (model.User, error) {
+// Fungsi untuk register
+func CreateUser(collection *mongo.Collection, name, username, email, password, role, phoneNumber string) (model.Users, error) {
+	// Validasi input
+	if name == "" || username == "" || email == "" || password == "" {
+		return model.Users{}, errors.New("name, username, email, and password are required")
+	}
+
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return model.User{}, err
+		return model.Users{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	// Buat objek user
-	user := model.User{
-		Username: username,
-		Email:    email,
-		Password: string(hashedPassword),
+	user := model.Users{
+		ID:          primitive.NewObjectID(),
+		Name:        name,
+		Role:        role,
+		PhoneNumber: phoneNumber,
+		Username:    username,
+		Email:       email,
+		Password:    string(hashedPassword),
 	}
 
 	// Masukkan ke MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result, err := collection.InsertOne(ctx, user)
+	_, err = collection.InsertOne(ctx, user)
 	if err != nil {
-		return model.User{}, err
+		return model.Users{}, fmt.Errorf("failed to insert user into MongoDB: %w", err)
 	}
-
-	// Set ID yang baru dibuat
-	user.ID = result.InsertedID.(primitive.ObjectID).Hex()
 
 	return user, nil
 }
@@ -65,8 +73,8 @@ func InsertAdmin(db *mongo.Database, col string, username, password, email strin
 
 	admin := bson.M{
 		"username": username,
-		"email":     email,
-		"password":  string(hashedPassword),
+		"email":    email,
+		"password": string(hashedPassword),
 	}
 
 	result, err := db.Collection(col).InsertOne(context.Background(), admin)
@@ -79,7 +87,7 @@ func InsertAdmin(db *mongo.Database, col string, username, password, email strin
 }
 
 // Fungsi untuk mendapatkan admin berdasarkan username
-func GetAdminByUsernameOrEmail(db *mongo.Database, col, username, email string) (*model.User, error) {
+func GetUserByUsernameOrEmail(db *mongo.Database, col, username, email string) (*model.User, error) {
 	var admin model.User
 	err := db.Collection(col).FindOne(context.Background(), bson.M{
 		"$or": []bson.M{
@@ -101,4 +109,3 @@ func ValidatePassword(hashedPassword, plainPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
 	return err == nil // Jika tidak ada error, password valid
 }
-
