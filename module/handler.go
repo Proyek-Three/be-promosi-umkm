@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
+
 )
 
 // Fungsi untuk register
@@ -64,20 +65,20 @@ func IsEmailExist(collection *mongo.Collection, email string) (bool, error) {
 }
 
 // Fungsi untuk memasukkan admin baru
-func InsertAdmin(db *mongo.Database, col string, username, password, email string) (primitive.ObjectID, error) {
+func InsertAdmin(db *mongo.Database, col string, user model.Users) (primitive.ObjectID, error) {
+	if user.Username == "" || user.Password == "" || user.Email == "" {
+		return primitive.NilObjectID, fmt.Errorf("username, password, and email cannot be empty")
+	}
+
 	// Hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return primitive.NilObjectID, err
 	}
+	user.Password = string(hashedPassword)
 
-	admin := bson.M{
-		"username": username,
-		"email":    email,
-		"password": string(hashedPassword),
-	}
-
-	result, err := db.Collection(col).InsertOne(context.Background(), admin)
+	// Simpan ke database
+	result, err := db.Collection(col).InsertOne(context.Background(), user)
 	if err != nil {
 		fmt.Printf("InsertAdmin: %v\n", err)
 		return primitive.NilObjectID, err

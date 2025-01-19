@@ -52,6 +52,7 @@ type User struct {
 	Username string `bson:"username,omitempty" json:"username"`
 	Email    string `bson:"email,omitempty" json:"email"`
 	Password string `bson:"password,omitempty" json:"password"`
+	Role     string `bson:"role,omitempty" json:"role"`
 }
 
 // Model untuk permintaan registrasi
