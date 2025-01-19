@@ -74,7 +74,8 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 			"status": product.Status.Status,
 		},
 		"user": bson.M{
-			"_id": product.User.ID,
+			"_id":      product.User.ID,
+			"username": product.User.Username,
 		},
 	}
 
