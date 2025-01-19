@@ -15,6 +15,7 @@ type Users struct {
 	Password    string             `json:"password,omitempty" bson:"password,omitempty"`
 	PhoneNumber string             `json:"phone_number,omitempty" bson:"phone_number,omitempty"`
 	Email       string             `json:"email,omitempty" bson:"email,omitempty"`
+	Store       Store              `json:"store,omitempty" bson:"store,omitempty"`
 }
 
 // Product represents the table Produk
@@ -44,6 +45,7 @@ type Store struct {
 	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	StoreName string             `json:"store_name,omitempty" bson:"store_name,omitempty"`
 	Address   string             `json:"address,omitempty" bson:"address,omitempty"`
+	Sosmed    string             `json:"sosmed,omitempty" bson:"sosmed,omitempty"`
 }
 
 // Model untuk User
