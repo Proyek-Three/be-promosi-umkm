@@ -45,7 +45,6 @@ type Store struct {
 	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	StoreName string             `json:"store_name,omitempty" bson:"store_name,omitempty"`
 	Address   string             `json:"address,omitempty" bson:"address,omitempty"`
-	Sosmed    string             `json:"sosmed,omitempty" bson:"sosmed,omitempty"`
 }
 
 // Model untuk User
