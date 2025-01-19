@@ -49,11 +49,6 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		return primitive.NilObjectID, fmt.Errorf("invalid status ID: cannot be empty")
 	}
 
-	// Validasi ID user
-	if product.User.ID.IsZero() {
-		return primitive.NilObjectID, fmt.Errorf("invalid status ID: cannot be empty")
-	}
-
 	// Menyusun dokumen BSON untuk produk
 	productData := bson.M{
 		"product_name": product.ProductName,
