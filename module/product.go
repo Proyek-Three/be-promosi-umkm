@@ -74,17 +74,8 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 			"status": product.Status.Status,
 		},
 		"user": bson.M{
-			"_id":      product.User.ID,          // ID pengguna
-			"name":     product.User.Name,        // Nama pengguna
-			"role":     product.User.Role,        // Peran pengguna
-			"username": product.User.Username,    // Nama pengguna
-			"email":    product.User.Email,       // Email pengguna
-			"phone":    product.User.PhoneNumber, // Nomor telepon pengguna
-			"store": bson.M{
-				"id":         product.User.Store.ID,        // ID toko
-				"store_name": product.User.Store.StoreName, // Nama toko
-				"address":    product.User.Store.Address,   // Alamat toko
-			},
+			"_id":      product.User.ID,
+			"username": product.User.Username,
 		},
 	}
 
