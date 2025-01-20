@@ -20,15 +20,16 @@ type Users struct {
 
 // Product represents the table Produk
 type Product struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	User        Users              `bson:"user,omitempty" json:"user,omitempty"`
-	ProductName string             `bson:"product_name,omitempty" json:"product_name,omitempty"`
-	Description string             `bson:"description,omitempty" json:"description,omitempty"`
-	Image       string             `bson:"image,omitempty" json:"image,omitempty"`
-	Price       float64            `bson:"price,omitempty" json:"price,omitempty"`
-	Category    Category           `bson:"category,omitempty" json:"category,omitempty"`
-	//Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
-	Status      Status             `bson:"status,omitempty" json:"status,omitempty"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	User         Users              `bson:"user,omitempty" json:"user,omitempty"`
+	ProductName  string             `bson:"product_name,omitempty" json:"product_name,omitempty"`
+	Description  string             `bson:"description,omitempty" json:"description,omitempty"`
+	Image        string             `bson:"image,omitempty" json:"image,omitempty"`
+	Price        float64            `bson:"price,omitempty" json:"price,omitempty"`
+	Category     Category           `bson:"category,omitempty" json:"category,omitempty"`
+	Status       Status             `bson:"status,omitempty" json:"status,omitempty"`
+	StoreName    string             `bson:"store_name,omitempty" json:"store_name,omitempty"`
+	StoreAddress string             `bson:"store_address,omitempty" json:"store_address,omitempty"`
 }
 
 type Status struct {
