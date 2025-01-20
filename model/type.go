@@ -20,7 +20,7 @@ type Users struct {
 
 // Product represents the table Produk
 type Product struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	User         Users              `bson:"user,omitempty" json:"user,omitempty"`
 	ProductName  string             `bson:"product_name,omitempty" json:"product_name,omitempty"`
 	Description  string             `bson:"description,omitempty" json:"description,omitempty"`
