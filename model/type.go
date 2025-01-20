@@ -27,7 +27,7 @@ type Product struct {
 	Image       string             `bson:"image,omitempty" json:"image,omitempty"`
 	Price       float64            `bson:"price,omitempty" json:"price,omitempty"`
 	Category    Category           `bson:"category,omitempty" json:"category,omitempty"`
-	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
+	//Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
 	Status      Status             `bson:"status,omitempty" json:"status,omitempty"`
 }
 
@@ -82,5 +82,5 @@ type DataUsers struct {
 	Password    string             `bson:"password,omitempty" json:"password,omitempty"`
 	PhoneNumber string             `bson:"phone_number,omitempty" json:"phone_number,omitempty"`
 	Email       string             `bson:"email,omitempty" json:"email,omitempty"`
-	Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
+	//Store       Store              `bson:"store,omitempty" json:"store,omitempty"`
 }

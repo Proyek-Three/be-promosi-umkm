@@ -39,11 +39,6 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		return primitive.NilObjectID, fmt.Errorf("invalid category ID: cannot be empty")
 	}
 
-	// Validasi ID toko
-	if product.Store.ID.IsZero() {
-		return primitive.NilObjectID, fmt.Errorf("invalid store ID: cannot be empty")
-	}
-
 	// Validasi ID status
 	if product.Status.ID.IsZero() {
 		return primitive.NilObjectID, fmt.Errorf("invalid status ID: cannot be empty")
@@ -58,11 +53,6 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"category": bson.M{
 			"_id":           product.Category.ID,
 			"category_name": product.Category.CategoryName,
-		},
-		"store": bson.M{
-			"_id":        product.Store.ID,
-			"store_name": product.Store.StoreName,
-			"address":    product.Store.Address,
 		},
 		"status": bson.M{
 			"_id":    product.Status.ID,
@@ -89,6 +79,7 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 
 	return insertedID, nil
 }
+
 
 // ALL
 func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
@@ -154,11 +145,6 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 		return fmt.Errorf("invalid category ID: cannot be empty")
 	}
 
-	// Validasi ID toko
-	if updatedProduct.Store.ID.IsZero() {
-		return fmt.Errorf("invalid store ID: cannot be empty")
-	}
-
 	// Validasi ID status
 	if updatedProduct.Status.ID.IsZero() {
 		return fmt.Errorf("invalid status ID: cannot be empty")
@@ -174,11 +160,6 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 			"category": bson.M{
 				"_id":           updatedProduct.Category.ID,
 				"category_name": updatedProduct.Category.CategoryName,
-			},
-			"store": bson.M{
-				"_id":        updatedProduct.Store.ID,
-				"store_name": updatedProduct.Store.StoreName,
-				"address":    updatedProduct.Store.Address,
 			},
 			"status": bson.M{
 				"_id":    updatedProduct.Status.ID,
@@ -203,6 +184,7 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 	fmt.Printf("Successfully updated product ID: %s\n", productID.Hex())
 	return nil
 }
+
 
 func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
 	productdata := db.Collection(col)
