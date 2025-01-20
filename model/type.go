@@ -8,7 +8,7 @@ import (
 
 // Users represents the table Users
 type Users struct {
-	ID          primitive.ObjectID `json:"_id,omitempty" bson:"id,omitempty"`
+	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
 	Role        string             `json:"role,omitempty" bson:"role,omitempty"`
 	Username    string             `json:"username,omitempty" bson:"username,omitempty" gorm:"unique;not null"`
@@ -20,7 +20,7 @@ type Users struct {
 
 // Product represents the table Produk
 type Product struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	User         Users              `bson:"user,omitempty" json:"user,omitempty"`
 	ProductName  string             `bson:"product_name,omitempty" json:"product_name,omitempty"`
 	Description  string             `bson:"description,omitempty" json:"description,omitempty"`
