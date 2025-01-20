@@ -1,102 +1,239 @@
 package _proyek3
 
 import (
-	"fmt"
+	"context"
 	"testing"
-
 	"github.com/Proyek-Three/be-promosi-umkm/model"
 	"github.com/Proyek-Three/be-promosi-umkm/module"
+	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// INSERT MENU
-func TestInsertProduct(t *testing.T) {
-	// Mock data untuk pengujian
-	productName := "Dimsum"
-	description := "Makanan dengan rasa spesial"
-	image := "image.jpg"
-	price := 10000.0
-
-	// Buat ID kategori dan toko
-	categoryID := primitive.NewObjectID()
-	storeID := primitive.NewObjectID()
-
-	// Buat data kategori
-	productCategory := model.Category{
-		ID:           categoryID,
-		CategoryName: "Makanan",
+func TestInsertUser(t *testing.T) {
+	// Setup MongoDB client and context
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://dzulkiflifaiz11:SAKTIMlucu12345@webservice.dqol9t4.mongodb.net/"))
+	if err != nil {
+		t.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
+	defer client.Disconnect(context.TODO())
+	db := client.Database("test_db")
+	col := "users"
 
-	// Buat data toko
+	// Create a valid store for testing
+	storeID := primitive.NewObjectID()
 	store := model.Store{
 		ID:        storeID,
-		StoreName: "Food Store",
-		Address:   "Jl. Sudirman No. 1 Jakarta Pusat",
+		StoreName: "Mie Gacoan",
+		Address:   "Jln Surya Sumantri",
 	}
 
-	// Buat data produk
-	productData := model.Product{
-		ProductName: productName,
-		Description: description,
-		Image:       image,
-		Price:       price,
-		Category:    productCategory,
-		Store:       store,
-	}
-
-	// Simpan produk ke MongoDB
-	insertedID, err := module.InsertProduct(module.MongoConn, "product", productData)
+	storeCollection := db.Collection("stores")
+	_, err = storeCollection.InsertOne(context.TODO(), store)
 	if err != nil {
-		t.Errorf("Error inserting data: %v", err)
+		t.Fatalf("Failed to insert store: %v", err)
 	}
 
-	// Pastikan ID yang dihasilkan valid
-	if insertedID.IsZero() {
-		t.Errorf("Inserted ID is zero")
+	// Create a DataUser instance with the store ID
+	user := model.DataUsers{
+		Username:  "julparker",
+		Password:  "securepassword",
+		PhoneNumber: "1234567890",
+		Email:     "johndoe@example.com",
+		Store:     store,
 	}
 
-	// Tampilkan hasil
-	fmt.Printf("Data berhasil disimpan dengan ID: %s\n", insertedID.Hex())
+	// Call InsertUser function
+	insertedID, err := module.InsertUser(db, col, user, storeID)
+	assert.NoError(t, err)
+	assert.NotEqual(t, insertedID, primitive.NilObjectID)
+
+	// Verify the user is inserted into the collection
+	var insertedUser model.DataUsers
+	err = db.Collection(col).FindOne(context.TODO(), bson.M{"_id": insertedID}).Decode(&insertedUser)
+	assert.NoError(t, err)
+	assert.Equal(t, "julparker", insertedUser.Username)
+	assert.Equal(t, storeID, insertedUser.Store.ID)
 }
 
-
-
-// BY ID
-func TestGetProductFromID(t *testing.T) {
-	id := "667e27a6cccefc9e0156f40d"
-	objectID, err := primitive.ObjectIDFromHex(id)
+func TestGetAllUsers(t *testing.T) {
+	// Setup MongoDB client and context
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://dzulkiflifaiz11:SAKTIMlucu12345@webservice.dqol9t4.mongodb.net/"))
 	if err != nil {
-		t.Fatalf("error converting id to ObjectID: %v", err)
+		t.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
-	productdata, err := module.GetProductFromID(objectID, module.MongoConn, "product")
+	defer client.Disconnect(context.TODO())
+	db := client.Database("test_db")
+	col := "users"
+
+	// Insert a user to test GetAllUsers
+	storeID := primitive.NewObjectID()
+	store := model.Store{
+		ID:        storeID,
+		StoreName: "Mie Gacoan",
+		Address:   "Jln Surya Sumantri",
+	}
+
+	storeCollection := db.Collection("stores")
+	_, err = storeCollection.InsertOne(context.TODO(), store)
 	if err != nil {
-		t.Fatalf("error calling GetMenuFromID: %v", err)
+		t.Fatalf("Failed to insert store: %v", err)
 	}
-	fmt.Println(productdata)
+
+	user := model.DataUsers{
+		Username:  "julparker",
+		Password:  "securepassword",
+		PhoneNumber: "1234567890",
+		Email:     "johndoe@example.com",
+		Store:     store,
+	}
+
+	_, err = module.InsertUser(db, col, user, storeID)
+	assert.NoError(t, err)
+
+	// Call GetAllUsers function
+	users, err := module.GetAllUsers(db, col)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, users)
 }
 
-// ALL
-func TestGetAll(t *testing.T) {
-	data := module.GetAllProduct(module.MongoConn, "product")
-	fmt.Println(data)
+func TestGetUserByID(t *testing.T) {
+	// Setup MongoDB client and context
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://dzulkiflifaiz11:SAKTIMlucu12345@webservice.dqol9t4.mongodb.net/"))
+	if err != nil {
+		t.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	defer client.Disconnect(context.TODO())
+	db := client.Database("test_db")
+	col := "users"
+
+	// Create a store and insert a user
+	storeID := primitive.NewObjectID()
+	store := model.Store{
+		ID:        storeID,
+		StoreName: "Mie Gacoan",
+		Address:   "Jln Surya Sumantri",
+	}
+
+	storeCollection := db.Collection("stores")
+	_, err = storeCollection.InsertOne(context.TODO(), store)
+	if err != nil {
+		t.Fatalf("Failed to insert store: %v", err)
+	}
+
+	user := model.DataUsers{
+		Username:  "julparker",
+		Password:  "securepassword",
+		PhoneNumber: "1234567890",
+		Email:     "johndoe@example.com",
+		Store:     store,
+	}
+
+	insertedID, err := module.InsertUser(db, col, user, storeID)
+	assert.NoError(t, err)
+
+	// Call GetUserByID function
+	fetchedUser, err := module.GetUserByID(insertedID, db, col)
+	assert.NoError(t, err)
+	assert.Equal(t, "julparker", fetchedUser.Username)
 }
 
-// DELETE
-func TestDeleteProductByID(t *testing.T) {
-	id := "667e5f1c0da481424d4fae0b" // ID data yang ingin dihapus
-	objectID, err := primitive.ObjectIDFromHex(id)
+func TestUpdateUser(t *testing.T) {
+	// Setup MongoDB client and context
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://dzulkiflifaiz11:SAKTIMlucu12345@webservice.dqol9t4.mongodb.net/"))
 	if err != nil {
-		t.Fatalf("error converting id to ObjectID: %v", err)
+		t.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	defer client.Disconnect(context.TODO())
+	db := client.Database("test_db")
+	col := "users"
+
+	// Create a store and insert a user
+	storeID := primitive.NewObjectID()
+	store := model.Store{
+		ID:        storeID,
+		StoreName: "Mie Gacoan",
+		Address:   "Jln Surya Sumantri",
 	}
 
-	err = module.DeleteProductByID(objectID, module.MongoConn, "product")
+	storeCollection := db.Collection("stores")
+	_, err = storeCollection.InsertOne(context.TODO(), store)
 	if err != nil {
-		t.Fatalf("error calling DeletePresensiByID: %v", err)
+		t.Fatalf("Failed to insert store: %v", err)
 	}
 
-	// Verifikasi bahwa data telah dihapus dengan melakukan pengecekan menggunakan GetPresensiFromID
-	_, err = module.GetProductFromID(objectID, module.MongoConn, "product")
-	if err == nil {
-		t.Fatalf("expected data to be deleted, but it still exists")
+	user := model.DataUsers{
+		Username:  "julparker",
+		Password:  "securepassword",
+		PhoneNumber: "1234567890",
+		Email:     "johndoe@example.com",
+		Store:     store,
 	}
+
+	insertedID, err := module.InsertUser(db, col, user, storeID)
+	assert.NoError(t, err)
+
+	// Update user details
+	updatedUser := model.DataUsers{
+		Username:  "julparker_updated",
+		Password:  "newpassword",
+		PhoneNumber: "0987654321",
+		Email:     "newemail@example.com",
+		Store:     store,
+	}
+
+	err = module.UpdateUser(db, col, insertedID, updatedUser, storeID)
+	assert.NoError(t, err)
+
+	// Verify the user is updated
+	fetchedUser, err := module.GetUserByID(insertedID, db, col)
+	assert.NoError(t, err)
+	assert.Equal(t, "julparker_updated", fetchedUser.Username)
 }
+
+func TestDeleteUserByID(t *testing.T) {
+	// Setup MongoDB client and context
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://dzulkiflifaiz11:SAKTIMlucu12345@webservice.dqol9t4.mongodb.net/"))
+	if err != nil {
+		t.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	defer client.Disconnect(context.TODO())
+	db := client.Database("test_db")
+	col := "users"
+
+	// Create a store and insert a user
+	storeID := primitive.NewObjectID()
+	store := model.Store{
+		ID:        storeID,
+		StoreName: "Mie Gacoan",
+		Address:   "Jln Surya Sumantri",
+	}
+
+	storeCollection := db.Collection("stores")
+	_, err = storeCollection.InsertOne(context.TODO(), store)
+	if err != nil {
+		t.Fatalf("Failed to insert store: %v", err)
+	}
+
+	user := model.DataUsers{
+		Username:  "julparker",
+		Password:  "securepassword",
+		PhoneNumber: "1234567890",
+		Email:     "johndoe@example.com",
+		Store:     store,
+	}
+
+	insertedID, err := module.InsertUser(db, col, user, storeID)
+	assert.NoError(t, err)
+
+	// Call DeleteUserByID function
+	err = module.DeleteUserByID(insertedID, db, col)
+	assert.NoError(t, err)
+
+	// Verify the user is deleted
+	_, err = module.GetUserByID(insertedID, db, col)
+	assert.Error(t, err)
+}
+

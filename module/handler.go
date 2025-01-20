@@ -109,6 +109,25 @@ func GetUserByUsernameOrEmail(db *mongo.Database, col, username, email string) (
 	return &admin, nil
 }
 
+func GetUserByUsername(db *mongo.Database, collectionName string, username string) (*model.Users, error) {
+	var user model.Users
+	collection := db.Collection(collectionName)
+
+	// Query filter berdasarkan username
+	filter := bson.M{"username": username}
+
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // User tidak ditemukan
+		}
+		return nil, err // Error saat query
+	}
+
+	return &user, nil
+}
+
+
 func ValidatePassword(hashedPassword, plainPassword string) bool {
 	// Gunakan bcrypt untuk membandingkan hash password
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
