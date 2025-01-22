@@ -3,7 +3,6 @@ package module
 import (
 	"context"
 	"fmt"
-
 	// "time"
 
 	"github.com/Proyek-Three/be-promosi-umkm/model"
@@ -46,10 +45,10 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 
 	// Menyusun dokumen BSON untuk produk
 	productData := bson.M{
-		"product_name":  product.ProductName,
-		"description":   product.Description,
-		"image":         product.Image,
-		"price":         product.Price,
+		"product_name": product.ProductName,
+		"description":  product.Description,
+		"image":        product.Image,
+		"price":        product.Price,
 		"category": bson.M{
 			"_id":           product.Category.ID,
 			"category_name": product.Category.CategoryName,
@@ -61,9 +60,11 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"user": bson.M{
 			"_id":      product.User.ID,
 			"username": product.User.Username,
+			"store": bson.M{
+				"store_name":    product.StoreName,
+				"store_address": product.StoreAddress,
+			},
 		},
-		"store_name":    product.StoreName,
-		"store_address": product.StoreAddress,
 	}
 
 	// Menyisipkan dokumen ke MongoDB
@@ -81,8 +82,6 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 
 	return insertedID, nil
 }
-
-
 
 // ALL
 func GetAllProduct(db *mongo.Database, col string) (data []model.Product) {
@@ -156,10 +155,10 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 	// Menyusun dokumen BSON untuk pembaruan
 	updateData := bson.M{
 		"$set": bson.M{
-			"product_name":  updatedProduct.ProductName,
-			"description":   updatedProduct.Description,
-			"image":         updatedProduct.Image,
-			"price":         updatedProduct.Price,
+			"product_name": updatedProduct.ProductName,
+			"description":  updatedProduct.Description,
+			"image":        updatedProduct.Image,
+			"price":        updatedProduct.Price,
 			"category": bson.M{
 				"_id":           updatedProduct.Category.ID,
 				"category_name": updatedProduct.Category.CategoryName,
@@ -189,7 +188,6 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 	fmt.Printf("Successfully updated product ID: %s\n", productID.Hex())
 	return nil
 }
-
 
 func DeleteProductByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
 	productdata := db.Collection(col)
