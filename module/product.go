@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"fmt"
+
 	// "time"
 
 	"github.com/Proyek-Three/be-promosi-umkm/model"
@@ -30,9 +31,6 @@ func InsertOneDoc(db string, collection string, doc interface{}) (insertedID int
 
 // INSERT PRODUCT
 func InsertProduct(db *mongo.Database, col string, product model.Product) (insertedID primitive.ObjectID, err error) {
-	// Logging untuk debugging
-	fmt.Printf("Inserting product: %+v\n", product)
-
 	// Validasi ID kategori
 	if product.Category.ID.IsZero() {
 		return primitive.NilObjectID, fmt.Errorf("invalid category ID: cannot be empty")
