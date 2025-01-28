@@ -170,29 +170,29 @@ func GetUsersByID(collection *mongo.Collection, userID string) (*model.Users, er
 	return &user, nil
 }
 
-func UpdateUser(collection *mongo.Collection, userID string, updateData map[string]interface{}) (*model.Users, error) {
-	// Konversi userID menjadi ObjectID
-	objID, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return nil, err
-	}
+func UpdateUser(collection *mongo.Collection, userID primitive.ObjectID, updateData map[string]interface{}) (*model.Users, error) {
+	// Konversi userID menjadi ObjectID (TIDAK PERLU LAGI karena userID sudah ObjectID dari awal)
+	// objID, err := primitive.ObjectIDFromHex(userID)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Hindari pembaruan pada field tertentu
 	delete(updateData, "_id")       // Jangan izinkan ID diubah
-	delete(updateData, "password") // Password sebaiknya diubah melalui fungsi terpisah
-	delete(updateData, "role")     // Role tidak boleh diubah tanpa validasi tambahan
+	delete(updateData, "password")  // Password sebaiknya diubah melalui fungsi terpisah
+	delete(updateData, "role")      // Role tidak boleh diubah tanpa validasi tambahan
 
 	// Tambahkan metadata pembaruan
 	updateData["updated_at"] = time.Now()
 
 	// Lakukan pembaruan
-	filter := bson.M{"_id": objID}
+	filter := bson.M{"_id": userID}
 	update := bson.M{"$set": updateData}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err = collection.UpdateOne(ctx, filter, update)
+	_, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
