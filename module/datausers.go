@@ -1,23 +1,22 @@
 package module
 
 import (
-	//"context"
-	//"fmt"
-	//"github.com/Proyek-Three/be-promosi-umkm/model"
-	//"go.mongodb.org/mongo-driver/bson"
-	//"go.mongodb.org/mongo-driver/bson/primitive"
-	//"go.mongodb.org/mongo-driver/mongo"
-)
+	"context"
+	"fmt"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 //func InsertUser(db *mongo.Database, col string, user model.DataUsers, storeID primitive.ObjectID) (insertedID primitive.ObjectID, err error) {
 //	if user.Username == "" || user.Password == "" {
 //		return primitive.NilObjectID, fmt.Errorf("username and password cannot be empty")
 //	}
 
-	// Jika Store ID tidak diberikan, buat Store baru
-	//var store model.Store
-	//storeCollection := db.Collection("stores")
+// Jika Store ID tidak diberikan, buat Store baru
+//var store model.Store
+//storeCollection := db.Collection("stores")
 
 //	if storeID.IsZero() {
 //		// Buat store baru jika ID tidak ada
@@ -40,10 +39,10 @@ import (
 ///	}
 //
 ///	// Tambahkan informasi store ke user
-	//user.ID = primitive.NewObjectID()
+//user.ID = primitive.NewObjectID()
 //	user.Store = store
 //
-	// Simpan user ke database
+// Simpan user ke database
 //	collection := db.Collection(col)
 //	result, err := collection.InsertOne(context.TODO(), user)
 //	if err != nil {
@@ -57,8 +56,6 @@ import (
 
 //	return insertedID, nil
 //}
-
-
 
 //func GetAllUsers(db *mongo.Database, col string) (data []model.DataUsers, err error) {
 //	collection := db.Collection(col)
@@ -74,7 +71,6 @@ import (
 //	return data, nil
 //}
 
-
 //func GetUserByID(_id primitive.ObjectID, db *mongo.Database, col string) (user model.DataUsers, err error) {
 //	collection := db.Collection(col)
 //	filter := bson.M{"_id": _id}
@@ -88,13 +84,12 @@ import (
 //	return user, nil
 //}
 
-
 //func UpdateUser(db *mongo.Database, col string, userID primitive.ObjectID, updatedUser model.DataUsers, storeID primitive.ObjectID) error {
 //	if updatedUser.Username == "" || updatedUser.Password == "" {
 //		return fmt.Errorf("username and password cannot be empty")
 //	}
 //
-	// Jika Store ID tidak diberikan, buat Store baru
+// Jika Store ID tidak diberikan, buat Store baru
 //	var store model.Store
 //	storeCollection := db.Collection("stores")
 
@@ -118,15 +113,15 @@ import (
 //		}
 //	}
 
-	// Siapkan data untuk update
+// Siapkan data untuk update
 //	updateData := bson.M{
 //		"$set": bson.M{
 //			"username":     updatedUser.Username,
 //			"password":     updatedUser.Password,
 //			"phone_number": updatedUser.PhoneNumber,
-	//		"email":        updatedUser.Email,
+//		"email":        updatedUser.Email,
 ///			"store":        store,
-	//	},
+//	},
 //	}
 
 //	collection := db.Collection(col)
@@ -143,20 +138,18 @@ import (
 //	return nil
 //}
 
+func DeleteUserByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
+	collection := db.Collection(col)
+	filter := bson.M{"_id": _id}
 
+	result, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return fmt.Errorf("error deleting user with ID %s: %w", _id.Hex(), err)
+	}
 
-//func DeleteUserByID(_id primitive.ObjectID, db *mongo.Database, col string) error {
-//	collection := db.Collection(col)
-//	filter := bson.M{"_id": _id}
-//
-//	result, err := collection.DeleteOne(context.TODO(), filter)
-//	if err != nil {
-//		return fmt.Errorf("error deleting user with ID %s: %w", _id.Hex(), err)
-//	}
+	if result.DeletedCount == 0 {
+		return fmt.Errorf("no user found with ID: %s", _id.Hex())
+	}
 
-//	if result.DeletedCount == 0 {
-//		return fmt.Errorf("no user found with ID: %s", _id.Hex())
-//	}
-//
-//	return nil
-//}
+	return nil
+}
