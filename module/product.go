@@ -60,7 +60,7 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 			"username": product.User.Username,
 			"store": bson.M{
 				"store_name":    product.StoreName,
-				"address": 	     product.StoreAddress,
+				"store_address": product.StoreAddress,
 			},
 		},
 	}
@@ -166,7 +166,7 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 				"status": updatedProduct.Status.Status,
 			},
 			"store_name":    updatedProduct.StoreName,
-			"address":       updatedProduct.StoreAddress,
+			"store_address": updatedProduct.StoreAddress,
 		},
 	}
 
