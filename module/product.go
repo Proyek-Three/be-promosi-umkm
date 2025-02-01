@@ -58,10 +58,13 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"user": bson.M{
 			"_id":      product.User.ID,
 			"username": product.User.Username,
+			"store": bson.M{
+				"store_name":    product.StoreName,
+				"store_address": product.StoreAddress,
+			},
 		},
-		"store_name":    product.StoreName,
-		"store_address": product.StoreAddress,
 	}
+	
 	
 
 	// Menyisipkan dokumen ke MongoDB
