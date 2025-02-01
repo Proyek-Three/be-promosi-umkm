@@ -166,7 +166,7 @@ func UpdateProduct(db *mongo.Database, col string, productID primitive.ObjectID,
 				"status": updatedProduct.Status.Status,
 			},
 			"store_name":    updatedProduct.StoreName,
-			"store_address": updatedProduct.StoreAddress,
+			"address": updatedProduct.StoreAddress,
 		},
 	}
 
