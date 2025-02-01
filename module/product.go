@@ -43,10 +43,10 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 
 	// Menyusun dokumen BSON untuk produk
 	productData := bson.M{
-		"product_name": product.ProductName,
-		"description":  product.Description,
-		"image":        product.Image,
-		"price":        product.Price,
+		"product_name":  product.ProductName,
+		"description":   product.Description,
+		"image":         product.Image,
+		"price":         product.Price,
 		"category": bson.M{
 			"_id":           product.Category.ID,
 			"category_name": product.Category.CategoryName,
@@ -58,12 +58,11 @@ func InsertProduct(db *mongo.Database, col string, product model.Product) (inser
 		"user": bson.M{
 			"_id":      product.User.ID,
 			"username": product.User.Username,
-			"store": bson.M{
-				"store_name":    product.StoreName,
-				"store_address": product.StoreAddress,
-			},
 		},
+		"store_name":    product.StoreName,
+		"store_address": product.StoreAddress,
 	}
+	
 
 	// Menyisipkan dokumen ke MongoDB
 	collection := db.Collection(col)
